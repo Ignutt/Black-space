@@ -51,5 +51,28 @@ namespace Common
                 OnTouchEnd?.Invoke(SideType.Right);
             };
         }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                OnTouchStart?.Invoke(SideType.Left);
+            }
+            
+            if (Input.GetKeyUp(KeyCode.A))
+            {
+                OnTouchEnd?.Invoke(SideType.Left);
+            }
+            
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                OnTouchStart?.Invoke(SideType.Right);
+            }
+            
+            if (Input.GetKeyUp(KeyCode.D))
+            {
+                OnTouchEnd?.Invoke(SideType.Right);
+            }
+        }
     }
 }

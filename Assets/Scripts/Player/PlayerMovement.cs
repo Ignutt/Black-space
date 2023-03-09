@@ -6,10 +6,11 @@ namespace Player
 {
     public class PlayerMovement : MonoBehaviour
     {
-        [SerializeField] private float speedMovement = 7f;
-
+        [SerializeField] private float accelerationX = 7f;
+        [SerializeField] private float maxSpeed = 10f;
+ 
         private Rigidbody2D _rigidbody;
-        private Vector3 _velocity;
+        private Vector2 _currentAcceleration;
 
         private void Awake()
         {
@@ -22,40 +23,40 @@ namespace Player
             {
                 if (side == SideType.Left)
                 {
-                    _velocity = new Vector2(speedMovement * -1, _rigidbody.velocity.y);
+                    _currentAcceleration = Vector2.left * accelerationX;
                     return;
                 }
                 
-                _velocity = new Vector2(speedMovement, _rigidbody.velocity.y);
+                _currentAcceleration = Vector2.right * accelerationX;
             };
 
             InputManager.Instance.OnTouchEnd += side =>
             {
                 if (side == SideType.Left)
                 {
-                    _velocity = new Vector2(
-                        _velocity.x < 0 ? 0 : _velocity.x,
-                        _rigidbody.velocity.y);
-                    
+                    _currentAcceleration = _currentAcceleration.magnitude > 0 ? _currentAcceleration : Vector2.zero;
                     return;
                 }
                 
-                _velocity = new Vector2(
-                    _velocity.x > 0 ? 0 : _velocity.x,
-                    _rigidbody.velocity.y);
+                _currentAcceleration = _currentAcceleration.magnitude < 0 ? _currentAcceleration : Vector2.zero;
             };
         }
 
         private void FixedUpdate()
         {
-            _rigidbody.velocity = new Vector2(_velocity.x, _rigidbody.velocity.y);
+            _rigidbody.AddForce(_currentAcceleration);
+
+            if (Mathf.Abs(_rigidbody.velocity.x) > maxSpeed)
+            {
+                _rigidbody.velocity = new Vector2(maxSpeed * (_rigidbody.velocity.x > 0 ? 1 : -1), _rigidbody.velocity.y);
+            }
         }
 
         private void OnValidate()
         {
-            if (speedMovement < 0)
+            if (accelerationX < 0)
             {
-                speedMovement *= -1;
+                accelerationX *= -1;
             }
         }
     }
